@@ -1,423 +1,64 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Little Lives — AI Family House</title>
-    <style>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        background: #111827;
-        color: #f8fafc;
-        font-family: system-ui, Arial, sans-serif;
-        overflow: hidden;
-      }
-      #scene {
-        position: fixed;
-        inset: 0;
-      }
-      #hud {
-        position: fixed;
-        top: 14px;
-        left: 14px;
-        width: min(310px, calc(100vw - 28px));
-        background: #111827df;
-        border: 1px solid #475569;
-        border-radius: 16px;
-        padding: 14px;
-        backdrop-filter: blur(8px);
-        max-height: 65vh;
-        overflow: auto;
-      }
-      h1 {
-        font-size: 18px;
-        margin: 0 0 4px;
-      }
-      .sub {
-        font-size: 12px;
-        color: #cbd5e1;
-        margin-bottom: 10px;
-      }
-      .person {
-        border-top: 1px solid #334155;
-        padding: 8px 0;
-        font-size: 13px;
-      }
-      .name {
-        font-weight: 700;
-      }
-      .action {
-        color: #a5b4fc;
-      }
-      .meter {
-        height: 5px;
-        background: #334155;
-        border-radius: 5px;
-        overflow: hidden;
-        margin: 4px 0 6px;
-      }
-      .fill {
-        height: 100%;
-        background: #34d399;
-      }
-      #toolbar {
-        position: fixed;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 8px;
-        background: #111827dd;
-        padding: 9px;
-        border-radius: 14px;
-        border: 1px solid #475569;
-      }
-      button {
-        border: 0;
-        border-radius: 9px;
-        background: #6366f1;
-        color: white;
-        padding: 10px 12px;
-        font-weight: 700;
-        cursor: pointer;
-      }
-      button:active {
-        transform: scale(0.96);
-      }
-      #clock {
-        font-size: 13px;
-        color: #fbbf24;
-        margin: 4px 0 10px;
-      }
-      #help {
-        position: fixed;
-        right: 12px;
-        top: 12px;
-        font-size: 12px;
-        background: #111827aa;
-        padding: 9px;
-        border-radius: 9px;
-        color: #e2e8f0;
-      }
-      @media (max-width: 650px) {
-        #hud {
-          top: 8px;
-          left: 8px;
-          width: 210px;
-          padding: 10px;
-          max-height: 43vh;
-        }
-        h1 {
-          font-size: 15px;
-        }
-        #help {
-          top: auto;
-          bottom: 84px;
-          right: 8px;
-          font-size: 10px;
-        }
-        #toolbar {
-          bottom: 8px;
-        }
-        button {
-          padding: 10px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="scene"></div>
-    <section id="hud">
-      <h1>🏡 Little Lives</h1>
-      <div class="sub">Your tiny autonomous family</div>
-      <div id="clock"></div>
-      <div id="family"></div>
-    </section>
-    <div id="help">Drag to orbit · Scroll/pinch to zoom</div>
-    <div id="toolbar">
-      <button id="pause">⏸ Pause</button><button id="speed">1× Speed</button
-      ><button id="reset">↺ Reset</button>
-    </div>
-    <script type="module">
-      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js";
-      import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/controls/OrbitControls.js";
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color("#a9c9dd");
-      const camera = new THREE.PerspectiveCamera(
-        42,
-        innerWidth / innerHeight,
-        0.1,
-        100,
-      );
-      camera.position.set(14, 17, 20);
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-      renderer.setSize(innerWidth, innerHeight);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      document.querySelector("#scene").appendChild(renderer.domElement);
-      const controls = new OrbitControls(camera, renderer.domElement);
-      controls.target.set(0, 0, 0);
-      controls.enableDamping = true;
-      controls.minDistance = 9;
-      controls.maxDistance = 40;
-      controls.maxPolarAngle = Math.PI / 2.05;
-      controls.update();
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x8090a0, 2));
-      const sun = new THREE.DirectionalLight(0xffffff, 2.1);
-      sun.position.set(-5, 15, 8);
-      sun.castShadow = true;
-      sun.shadow.mapSize.set(2048, 2048);
-      sun.shadow.camera.left = -14;
-      sun.shadow.camera.right = 14;
-      sun.shadow.camera.top = 14;
-      sun.shadow.camera.bottom = -14;
-      scene.add(sun);
-      const mat = (c) =>
-        new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 });
-      const floorMat = mat("#e6d6bb");
-      function box(x, y, z, w, h, d, color, cast = true) {
-        const m = new THREE.Mesh(
-          new THREE.BoxGeometry(w, h, d),
-          typeof color === "string" ? mat(color) : color,
-        );
-        m.position.set(x, y, z);
-        m.castShadow = cast;
-        m.receiveShadow = true;
-        scene.add(m);
-        return m;
-      }
-      function ball(parent, x, y, z, r, color) {
-        const m = new THREE.Mesh(
-          new THREE.SphereGeometry(r, 12, 10),
-          mat(color),
-        );
-        m.position.set(x, y, z);
-        m.castShadow = true;
-        parent.add(m);
-        return m;
-      }
-      box(0, -0.25, 0, 13, 0.5, 10, "#7d9b76");
-      box(0, -0.015, 0, 12, 0.08, 9, floorMat); // outer walls and low room dividers
-      box(0, 0.85, -4.5, 12, 1.7, 0.16, "#f6f0e8");
-      box(-6, 0.85, 0, 0.16, 1.7, 9, "#f6f0e8");
-      box(6, 0.85, 0, 0.16, 1.7, 9, "#f6f0e8");
-      box(0, 0.85, 4.5, 12, 1.7, 0.16, "#f6f0e8");
-      box(0, 0.25, 0, 0.12, 0.5, 9, "#faf7ef");
-      box(0, 0.25, 0, 12, 0.5, 0.12, "#faf7ef");
-      // room rugs, furniture: front left living, front right kitchen, rear left bedroom, rear right bathroom
-      box(-3, 0.035, 2.3, 4.6, 0.04, 3, "#a9c4b8");
-      box(-4.5, 0.45, 2.9, 1.1, 0.7, 2.4, "#d08d79");
-      box(-4.5, 0.87, 3.85, 1.1, 0.5, 0.35, "#d08d79");
-      box(-3, 0.25, 1.5, 1.6, 0.4, 1, "#b47c52");
-      box(-1, 0.7, 3.7, 0.3, 1.2, 1.2, "#475569");
-      box(3, 0.035, 2.2, 4.7, 0.04, 3.2, "#efd2a6");
-      box(4.7, 0.48, 3.4, 2, 0.9, 0.8, "#b7d5c3");
-      box(4.7, 1, 3.4, 2, 0.12, 0.8, "#f8fafc");
-      box(2.8, 0.5, 1.5, 1.7, 0.14, 1.4, "#b77f4f");
-      for (const [x, z] of [
-        [2.1, 1.5],
-        [3.5, 1.5],
-        [2.8, 0.8],
-        [2.8, 2.2],
-      ])
-        box(x, 0.26, z, 0.45, 0.5, 0.45, "#a47753");
-      box(-3, 0.035, -2.3, 4.7, 0.04, 3.2, "#c5b6d6");
-      box(-4.1, 0.34, -2.4, 2.5, 0.5, 2.2, "#f8fafc");
-      box(-4.1, 0.64, -2.4, 2.2, 0.13, 1.8, "#a9b7ed");
-      box(-4.1, 0.77, -3.1, 1.7, 0.15, 0.4, "#fff2d6");
-      box(-1.4, 0.55, -3.2, 0.7, 1.1, 0.8, "#b98c69");
-      box(3, 0.035, -2.3, 4.7, 0.04, 3.2, "#c7e8e9");
-      box(4.2, 0.25, -2.9, 2.1, 0.4, 1.2, "#ffffff");
-      box(4.2, 0.6, -3.4, 2.1, 0.65, 0.18, "#f8fafc");
-      box(1.8, 0.43, -3.1, 0.9, 0.75, 0.75, "#e2e8f0");
-      box(1.8, 0.85, -3.1, 0.5, 0.12, 0.5, "#ffffff");
-      box(4.8, 0.3, -1.2, 0.7, 0.6, 0.7, "#f8fafc");
-      // house labels as floating sprites
-      function label(text, x, z) {
-        const c = document.createElement("canvas");
-        c.width = 256;
-        c.height = 64;
-        const ctx = c.getContext("2d");
-        ctx.fillStyle = "#243447";
-        ctx.font = "bold 30px system-ui";
-        ctx.textAlign = "center";
-        ctx.fillText(text, 128, 42);
-        const t = new THREE.CanvasTexture(c);
-        const s = new THREE.Sprite(
-          new THREE.SpriteMaterial({ map: t, transparent: true }),
-        );
-        s.position.set(x, 1.7, z);
-        s.scale.set(2.8, 0.7, 1);
-        scene.add(s);
-      }
-      label("LIVING", -3, 3.7);
-      label("KITCHEN", 3, 3.7);
-      label("BEDROOM", -3, -3.8);
-      label("BATHROOM", 3, -3.8);
-      const spots = {
-        living: [-2.7, 2.3],
-        kitchen: [3, 2.4],
-        bedroom: [-3, -2],
-        bathroom: [3, -2.2],
-      };
-      const roles = [
-        { name: "Dad", color: "#4f7cbd", hair: "#33251d", speed: 1.2 },
-        { name: "Mom", color: "#d77691", hair: "#4c3028", speed: 1.3 },
-        { name: "Alex", color: "#6d9f66", hair: "#36231b", speed: 1.55 },
-        { name: "Mia", color: "#e6a64f", hair: "#5a3925", speed: 1.45 },
-      ];
-      const people = roles.map((p, i) => {
-        const g = new THREE.Group();
-        const h = i < 2 ? 1.0 : 0.78;
-        const torso = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.24, 0.3, h * 0.58, 10),
-          mat(p.color),
-        );
-        torso.position.y = h * 0.45;
-        torso.castShadow = true;
-        g.add(torso);
-        ball(g, 0, h * 0.9, 0, 0.23, i === 1 ? "#e5ae86" : "#d9a17c");
-        const hair = new THREE.Mesh(
-          new THREE.SphereGeometry(
-            0.235,
-            12,
-            8,
-            0,
-            Math.PI * 2,
-            0,
-            Math.PI * 0.45,
-          ),
-          mat(p.hair),
-        );
-        hair.position.y = h * 0.99;
-        g.add(hair);
-        for (const dx of [-0.1, 0.1])
-          ball(g, dx, h * 0.9, 0.2, 0.025, "#222222");
-        g.position.set(-4 + i * 0.65, 0.08, 2.1);
-        scene.add(g);
-        return {
-          ...p,
-          mesh: g,
-          hunger: 60 + Math.random() * 35,
-          energy: 65 + Math.random() * 35,
-          happy: 75,
-          room: "living",
-          target: "living",
-          action: "Relaxing",
-          wait: 0,
-          walking: false,
-        };
-      });
-      let paused = false,
-        multiplier = 1,
-        minutes = 7 * 60;
-      const clamp = (v) => Math.max(0, Math.min(100, v));
-      function choose(p) {
-        if (p.energy < 30) {
-          p.target = "bedroom";
-          p.action = "Going to sleep";
-        } else if (p.hunger < 35) {
-          p.target = "kitchen";
-          p.action = "Going to eat";
-        } else {
-          const rooms = ["living", "kitchen", "bedroom", "bathroom"];
-          p.target = rooms[Math.floor(Math.random() * rooms.length)];
-          p.action = {
-            living: "Relaxing",
-            kitchen: "Having a snack",
-            bedroom: "Taking a rest",
-            bathroom: "Freshening up",
-          }[p.target];
-        }
-        p.wait = 3 + Math.random() * 5;
-        p.walking = true;
-      }
-      function update(dt) {
-        minutes += dt * 2.5;
-        for (const p of people) {
-          p.hunger = clamp(p.hunger - dt * 0.3);
-          p.energy = clamp(p.energy - dt * 0.19);
-          p.happy = clamp(p.happy - dt * 0.09);
-          if (p.walking) {
-            const [x, z] = spots[p.target];
-            const dx = x - p.mesh.position.x,
-              dz = z - p.mesh.position.z,
-              dist = Math.hypot(dx, dz);
-            if (dist > 0.12) {
-              const step = Math.min(dist, p.speed * dt);
-              p.mesh.position.x += (dx / dist) * step;
-              p.mesh.position.z += (dz / dist) * step;
-              p.mesh.rotation.y = Math.atan2(dx, dz);
-              p.action = "Walking to " + p.target;
-            } else {
-              p.walking = false;
-              p.room = p.target;
-              p.wait = 4 + Math.random() * 6;
-            }
-          } else {
-            p.wait -= dt;
-            if (p.room === "kitchen") p.hunger = clamp(p.hunger + dt * 5);
-            if (p.room === "bedroom") p.energy = clamp(p.energy + dt * 3.8);
-            if (p.room === "living") p.happy = clamp(p.happy + dt * 2.2);
-            if (p.room === "bathroom") p.happy = clamp(p.happy + dt * 1.2);
-            if (p.wait <= 0) choose(p);
-          }
-        }
-      }
-      function ui() {
-        const hh = Math.floor(minutes / 60) % 24,
-          mm = Math.floor(minutes % 60);
-        document.querySelector("#clock").textContent =
-          "🕒 Day " +
-          (Math.floor(minutes / 1440) + 1) +
-          " · " +
-          String(hh).padStart(2, "0") +
-          ":" +
-          String(mm).padStart(2, "0");
-        document.querySelector("#family").innerHTML = people
-          .map(
-            (p) =>
-              `<div class="person"><span class="name">${p.name}</span> · <span class="action">${p.action}</span><div>🍲 Hunger ${Math.round(p.hunger)} · ⚡ Energy ${Math.round(p.energy)} · 😊 ${Math.round(p.happy)}</div><div class="meter"><div class="fill" style="width:${p.energy}%;background:${p.energy < 30 ? "#fb7185" : "#34d399"}"></div></div></div>`,
-          )
-          .join("");
-      }
-      const clock = new THREE.Clock();
-      let uiElapsed = 0;
-      function animate() {
-        requestAnimationFrame(animate);
-        const realDt = Math.min(clock.getDelta(), 0.05);
-        if (!paused) {
-          const dt = realDt * multiplier;
-          update(dt);
-          uiElapsed += realDt;
-          if (uiElapsed > 0.3) {
-            ui();
-            uiElapsed = 0;
-          }
-        }
-        controls.update();
-        renderer.render(scene, camera);
-      }
-      ui();
-      animate();
-      document.querySelector("#pause").onclick = (e) => {
-        paused = !paused;
-        e.target.textContent = paused ? "▶ Play" : "⏸ Pause";
-      };
-      document.querySelector("#speed").onclick = (e) => {
-        multiplier = multiplier === 1 ? 3 : multiplier === 3 ? 6 : 1;
-        e.target.textContent = multiplier + "× Speed";
-      };
-      document.querySelector("#reset").onclick = () => location.reload();
-      window.addEventListener("resize", () => {
-        camera.aspect = innerWidth / innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(innerWidth, innerHeight);
-      });
-    </script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Little Lives — AI Family House</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E🏠%3C/text%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101827;color:#f3f6ff;font:14px system-ui,Arial,sans-serif;overflow:hidden}#scene{position:fixed;inset:0}#panel{position:fixed;top:14px;left:14px;width:min(315px,calc(100vw - 28px));padding:14px;background:#111c30e8;border:1px solid #40516c;border-radius:16px;backdrop-filter:blur(10px)}h1{margin:0;font-size:20px}#clock{color:#b9c7e1;margin:5px 0 10px}.person{display:flex;justify-content:space-between;gap:12px;margin:8px 0}.person small{color:#bdc8dc}.bar{height:5px;background:#31405a;border-radius:8px;overflow:hidden;margin-top:4px}.bar>span{display:block;height:100%;background:#75d8b1}.stat{width:95px;text-align:right}#controls{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:8px;background:#111c30e8;border:1px solid #40516c;border-radius:14px}button{background:#6565ee;color:white;border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer;white-space:nowrap}button:hover{background:#7b7bf5}#hint{position:fixed;right:16px;top:15px;color:#c3cde0;text-align:right;font-size:12px}#error{display:none;position:fixed;left:12px;right:12px;bottom:90px;padding:12px;background:#692c35;color:white;border-radius:10px;z-index:10}@media(max-width:650px){#panel{width:245px;padding:10px}h1{font-size:17px}.person{font-size:12px}.stat{width:75px}#hint{top:auto;bottom:86px;right:12px}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="scene"></div>
+<section id="panel"><h1>🏠 Little Lives</h1><div id="clock">Loading family...</div><div id="family"></div></section>
+<div id="hint">Drag to rotate · Scroll / pinch to zoom</div>
+<div id="controls"><button id="pause">⏸ Pause</button><button id="speed">1× Speed</button><button id="reset">↺ Reset</button></div>
+<div id="error"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+try {
+const scene=new THREE.Scene();scene.background=new THREE.Color('#101827');
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,100);camera.position.set(12,14,17);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.querySelector('#scene').appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,0,0);controls.enableDamping=true;controls.minDistance=9;controls.maxDistance=34;controls.maxPolarAngle=Math.PI/2.06;controls.update();
+scene.add(new THREE.HemisphereLight(0xffffff,0x65758c,2));const sun=new THREE.DirectionalLight(0xffffff,2.2);sun.position.set(-5,12,7);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-12;sun.shadow.camera.right=12;sun.shadow.camera.top=12;sun.shadow.camera.bottom=-12;scene.add(sun);
+const mat=(color)=>new THREE.MeshStandardMaterial({color,roughness:.85});
+function box(x,y,z,w,h,d,color){const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);return mesh}
+function sphere(x,y,z,r,color){const mesh=new THREE.Mesh(new THREE.SphereGeometry(r,14,10),mat(color));mesh.position.set(x,y,z);mesh.castShadow=true;scene.add(mesh);return mesh}
+// House: front walls omitted for an unobstructed dollhouse view.
+box(0,-.22,0,10,.35,8,'#677789');box(-2.5,-.025,0,4.95,.07,7.9,'#d6c7aa');box(2.5,-.02,0,4.95,.07,7.9,'#e0d2bd');
+box(-2.5,-.005,-2,4.9,.03,3.9,'#a7d4b1');box(2.5,-.004,-2,4.9,.03,3.9,'#d5b9d9');
+box(0,1,-4,10,2,.16,'#f4e9d5');box(-5,1,0,.16,2,8,'#f4e9d5');box(5,1,0,.16,2,8,'#f4e9d5');
+// Rear half-height partitions keep the rooms visible.
+box(0,.4,-2,.12,.8,3.5,'#f1e6d6');box(0,.4,2,.12,.8,3.4,'#f1e6d6');box(-3,.35,0,3.8,.7,.12,'#f1e6d6');box(3,.35,0,3.8,.7,.12,'#f1e6d6');
+// Living room, front left
+box(-2.8,.25,2.6,2,.5,.8,'#5f8fbd');box(-2.8,.53,2.95,2,.55,.22,'#5f8fbd');box(-2.8,.15,1.4,1.25,.28,.65,'#b78662');box(-4.2,.48,1.25,.18,.85,1.3,'#263e59');
+// Kitchen, front right
+box(3.6,.38,3.15,2.2,.75,.65,'#a7c5bf');box(2.3,.36,1.55,1.3,.12,1.1,'#ad825c');for(const x of [1.8,2.8])for(const z of [1.1,2])box(x,.2,z,.32,.4,.32,'#8d664d');
+// Bedroom, rear left
+box(-2.7,.24,-2.75,2.2,.4,1.65,'#a58ec8');box(-2.7,.48,-3.25,1.9,.15,.4,'#f4f0e8');box(-4.2,.55,-3.15,.65,1.1,.75,'#9b735c');
+// Bathroom, rear right
+box(3.4,.25,-2.7,1.7,.45,1.4,'#e7edf1');box(1.6,.4,-3.2,.65,.8,.55,'#b5d9e7');box(4.35,.27,-1.3,.65,.54,.65,'#f2f4f7');
+// Decorative rugs
+box(-2.6,.025,1.85,2.7,.025,1.2,'#e6b7a3');box(2.65,.025,-1.5,2.5,.025,1.2,'#c9e5e5');
+const rooms={living:{x:-2.6,z:1.7},kitchen:{x:2.65,z:1.5},bedroom:{x:-2.6,z:-1.7},bathroom:{x:2.6,z:-1.6}};
+const profiles=[{name:'Dad',color:'#547fe0',start:'living'},{name:'Mom',color:'#e36f9e',start:'kitchen'},{name:'Alex',color:'#e4b24e',start:'bedroom'},{name:'Mia',color:'#8d7ce1',start:'living'}];
+const family=profiles.map((p,i)=>{const group=new THREE.Group();scene.add(group);const body=new THREE.Mesh(new THREE.CylinderGeometry(.24,.3,.68,10),mat(p.color));body.position.y=.48;body.castShadow=true;group.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.23,14,12),mat('#f1c9a6'));head.position.y=1.03;head.castShadow=true;group.add(head);const hair=new THREE.Mesh(new THREE.SphereGeometry(.235,14,12),mat(i===1?'#593c2f':'#3b302e'));hair.scale.y=.45;hair.position.y=1.17;group.add(hair);const start=rooms[p.start];group.position.set(start.x+(i%2)*.5-.25,.04,start.z+(i%2)*.5-.25);return {...p,group,room:p.start,target:group.position.clone(),hunger:75-i*8,energy:75+i*5,happiness:85-i*4,action:'Exploring',timer:0}});
+let minutes=7*60,paused=false,speed=1,elapsed=0;const clamp=n=>Math.max(0,Math.min(100,n));const rand=(a,b)=>a+Math.random()*(b-a);
+function choose(p){let room,action;if(p.energy<28){room='bedroom';action='Sleeping'}else if(p.hunger<35){room='kitchen';action='Eating'}else if(Math.random()<.18){room='bathroom';action='Bathing'}else{room=Math.random()<.55?'living':'kitchen';action=room==='living'?'Relaxing':'Cooking'}p.room=room;p.action='Walking to '+room;const r=rooms[room];p.target.set(r.x+rand(-.65,.65),.04,r.z+rand(-.5,.5));p.nextAction=action;p.timer=rand(4,8)}
+function update(dt){minutes+=dt*3;for(const p of family){p.hunger=clamp(p.hunger-dt*.55);p.energy=clamp(p.energy-dt*.35);p.happiness=clamp(p.happiness-dt*.12);const direction=p.target.clone().sub(p.group.position);direction.y=0;if(direction.length()>.08){direction.normalize();p.group.position.addScaledVector(direction,Math.min(dt*1.2,p.group.position.distanceTo(p.target)));p.group.rotation.y=Math.atan2(direction.x,direction.z)}else{p.action=p.nextAction||p.action;p.timer-=dt;if(p.action==='Eating')p.hunger=clamp(p.hunger+dt*8);if(p.action==='Sleeping')p.energy=clamp(p.energy+dt*7);if(p.action==='Relaxing')p.happiness=clamp(p.happiness+dt*3);if(p.timer<=0)choose(p)}}}
+function refreshUI(){const h=Math.floor(minutes/60)%24,m=Math.floor(minutes%60);document.querySelector('#clock').textContent=`Day ${Math.floor(minutes/1440)+1} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;document.querySelector('#family').innerHTML=family.map(p=>`<div class="person"><div><strong style="color:${p.color}">●</strong> ${p.name}<br><small>${p.action}</small></div><div class="stat"><small>🍽 ${Math.round(p.hunger)} · ⚡ ${Math.round(p.energy)}</small><div class="bar"><span style="width:${p.happiness}%"></span></div></div></div>`).join('')}
+let previous=performance.now(),uiTime=0;function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-previous)/1000,.05);previous=now;if(!paused)update(dt*speed);controls.update();renderer.render(scene,camera);uiTime+=dt;if(uiTime>.25){refreshUI();uiTime=0}}family.forEach(choose);refreshUI();requestAnimationFrame(animate);
+document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'▶ Play':'⏸ Pause'};
+document.querySelector('#speed').onclick=e=>{speed=speed===1?3:speed===3?6:1;e.target.textContent=speed+'× Speed'};
+document.querySelector('#reset').onclick=()=>location.reload();
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+} catch(err){console.error(err);const el=document.querySelector('#error');el.style.display='block';el.textContent='3D rendering error: '+err.message;}
+</script>
+</body>
 </html>
