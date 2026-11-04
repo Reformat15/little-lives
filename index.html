@@ -3,13 +3,15 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E🏠%3C/text%3E%3C/svg%3E">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101827;color:#f1f5ff;font:14px system-ui,Arial;overflow:hidden}#scene{position:fixed;inset:0}#panel{position:fixed;top:14px;left:14px;width:min(328px,calc(100vw - 28px));max-height:calc(100vh - 105px);overflow:auto;padding:14px;background:#101d32ee;border:1px solid #40516c;border-radius:16px;backdrop-filter:blur(10px)}h1{margin:0;font-size:20px}.sub{font-size:12px;color:#afc0dc;margin:4px 0 10px}.person{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #30405a}.person small{color:#b9c7de}.stats{text-align:right;min-width:98px;font-size:12px}.bar{height:5px;background:#34435a;border-radius:9px;margin-top:5px;overflow:hidden}.bar span{display:block;height:100%;background:#7fe2b8}.talk{font-size:12px;color:#f4d99c;margin-top:4px;max-width:170px}.controls{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:7px;padding:8px;background:#101d32e8;border:1px solid #40516c;border-radius:14px}button{background:#6268eb;color:#fff;border:0;border-radius:9px;padding:10px 12px;font-weight:700;cursor:pointer;white-space:nowrap}button:hover{background:#7c81fa}button:disabled{opacity:.55;cursor:default}#hint{position:fixed;right:15px;top:14px;color:#bac8de;font-size:12px;text-align:right}#status{font-size:12px;color:#a8b8d2;margin-top:8px}#log{font-size:12px;line-height:1.5;color:#dbe4f7;max-height:90px;overflow:auto}#log div{margin:4px 0}.airow{display:flex;gap:7px;align-items:center;margin:10px 0 4px}#error{position:fixed;bottom:80px;left:12px;right:12px;display:none;background:#722c3c;padding:12px;border-radius:10px}#config{margin-top:10px;padding-top:8px;border-top:1px solid #40516c}input{width:100%;background:#1c2c45;border:1px solid #526582;border-radius:8px;padding:9px;color:white;margin-top:6px}label{font-size:12px;color:#c5d1e5}#config button{margin-top:7px}#config summary{cursor:pointer;font-size:12px;color:#d4dafa}#badge{font-size:12px;color:#98f0bd} @media(max-width:680px){#panel{width:250px;padding:10px;max-height:55vh}#hint{top:auto;bottom:80px}button{padding:9px}h1{font-size:17px}.controls{max-width:98vw}}
+
+#panel{z-index:6;transition:width .2s ease}#panel h1{padding-right:38px}#minimize{position:absolute;top:9px;right:9px;padding:5px 11px;background:#304463;font-size:20px;line-height:1.1}#panel.minimized{width:192px;max-height:none;overflow:hidden}#panel.minimized #panelBody{display:none}#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:3}.char-label{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:4px;max-width:190px;will-change:transform,left,top}.char-name{font-size:12px;font-weight:800;color:white;background:#17263bdc;border:1px solid #8a9cb7a0;padding:3px 9px;border-radius:20px;box-shadow:0 3px 10px #0005;white-space:nowrap}.char-bubble{font-size:12px;line-height:1.3;background:#fffdf3;color:#283044;border-radius:13px;padding:8px 11px;box-shadow:0 5px 18px #0005;max-width:190px;text-align:center;overflow-wrap:anywhere;position:relative}.char-bubble:after{content:'';position:absolute;left:calc(50% - 6px);bottom:-6px;width:12px;height:12px;transform:rotate(45deg);background:#fffdf3}.char-label.offscreen{display:none}@media(max-width:680px){#panel{max-height:48vh;width:min(265px,calc(100vw - 25px))}#panel.minimized{width:160px}#panel h1{font-size:16px}.char-bubble{font-size:11px;max-width:135px}.char-name{font-size:11px}#hint{font-size:10px}}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-</head><body><div id="scene"></div><aside id="panel"><h1>🏠 Little Lives <span id="badge">V2</span></h1><div id="clock" class="sub">Loading...</div><div id="family"></div><div class="airow"><button id="ai">Enable Gemini</button><span id="status">Offline brains active</span></div><details id="config"><summary>Gemini connection settings</summary><label for="endpoint">Cloudflare Worker endpoint (never enter an API key here)</label><input id="endpoint" placeholder="https://little-lives-ai.YOUR-NAME.workers.dev"><button id="connect">Save endpoint</button><p class="sub">The browser sends family state to your Worker. AI is optional; the simulation works without it.</p></details><div class="sub">Family conversations</div><div id="log" aria-live="polite"></div></aside><div id="hint">Drag to rotate · Scroll / pinch to zoom</div><div class="controls"><button id="pause">⏸ Pause</button><button id="speed">1× Speed</button><button id="reset">↺ Reset</button></div><div id="error"></div>
+</head><body><div id="scene"></div><aside id="panel"><h1>🏠 Little Lives <span id="badge">V3</span></h1><button id="minimize" type="button" aria-label="Minimize family status">−</button><div id="panelBody"><div id="clock" class="sub">Loading...</div><div id="family"></div><div class="airow"><button id="ai">Enable Gemini</button><span id="status">Offline brains active</span></div><details id="config"><summary>Gemini connection settings</summary><label for="endpoint">Cloudflare Worker endpoint (never enter an API key here)</label><input id="endpoint" placeholder="https://little-lives-ai.YOUR-NAME.workers.dev"><button id="connect">Save endpoint</button><p class="sub">The browser sends family state to your Worker. AI is optional; the simulation works without it.</p></details><div class="sub">Family conversations</div><div id="log" aria-live="polite"></div></div></aside><div id="labels" aria-hidden="true"></div><div id="hint">Drag to rotate · Scroll / pinch to zoom</div><div class="controls"><button id="pause">⏸ Pause</button><button id="speed">1× Speed</button><button id="reset">↺ Reset</button></div><div id="error"></div>
 <script type="module">
 import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 try{
-const scene=new THREE.Scene();scene.background=new THREE.Color('#101827');const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,100);camera.position.set(12,14,17);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#101827');const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,100);camera.position.set(12,16,17);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.querySelector('#scene').appendChild(renderer.domElement);
 const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(0,0,0);orbit.enableDamping=true;orbit.minDistance=9;orbit.maxDistance=34;orbit.maxPolarAngle=Math.PI/2.06;orbit.update();
 scene.add(new THREE.HemisphereLight(0xffffff,0x6d7790,2));const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(-5,12,7);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-12;sun.shadow.camera.right=12;sun.shadow.camera.top=12;sun.shadow.camera.bottom=-12;scene.add(sun);
@@ -19,20 +21,105 @@ function part(group,shape,c,x,y,z){const o=new THREE.Mesh(shape,mat(c));o.positi
 // Same four-room dollhouse, furniture, and camera as V1.
 cube(0,-.22,0,10,.35,8,'#677789');cube(-2.5,-.025,0,4.95,.07,7.9,'#d6c7aa');cube(2.5,-.02,0,4.95,.07,7.9,'#e0d2bd');cube(-2.5,-.005,-2,4.9,.03,3.9,'#a7d4b1');cube(2.5,-.004,-2,4.9,.03,3.9,'#d5b9d9');cube(0,1,-4,10,2,.16,'#f4e9d5');cube(-5,1,0,.16,2,8,'#f4e9d5');cube(5,1,0,.16,2,8,'#f4e9d5');cube(0,.4,-2,.12,.8,3.5,'#f1e6d6');cube(0,.4,2,.12,.8,3.4,'#f1e6d6');cube(-3,.35,0,3.8,.7,.12,'#f1e6d6');cube(3,.35,0,3.8,.7,.12,'#f1e6d6');
 cube(-2.8,.25,2.6,2,.5,.8,'#5f8fbd');cube(-2.8,.53,2.95,2,.55,.22,'#5f8fbd');cube(-2.8,.15,1.4,1.25,.28,.65,'#b78662');cube(-4.2,.48,1.25,.18,.85,1.3,'#263e59');cube(3.6,.38,3.15,2.2,.75,.65,'#a7c5bf');cube(2.3,.36,1.55,1.3,.12,1.1,'#ad825c');for(const x of [1.8,2.8])for(const z of [1.1,2])cube(x,.2,z,.32,.4,.32,'#8d664d');cube(-2.7,.24,-2.75,2.2,.4,1.65,'#a58ec8');cube(-2.7,.48,-3.25,1.9,.15,.4,'#f4f0e8');cube(-4.2,.55,-3.15,.65,1.1,.75,'#9b735c');cube(3.4,.25,-2.7,1.7,.45,1.4,'#e7edf1');cube(1.6,.4,-3.2,.65,.8,.55,'#b5d9e7');cube(4.35,.27,-1.3,.65,.54,.65,'#f2f4f7');cube(-2.6,.025,1.85,2.7,.025,1.2,'#e6b7a3');cube(2.65,.025,-1.5,2.5,.025,1.2,'#c9e5e5');
+// Architectural detailing: timber floorboards, windows, doors, trim, fixtures, and decor.
+const oak='#b98a5b', grout='#a6784e';
+for(let i=0;i<16;i++){
+ const z=-3.77+i*.49;
+ cube(-2.5,.029,z,4.85,.012,.012,grout);
+ cube(2.5,.029,z,4.85,.012,.012,grout);
+}
+// Window frames on the rear wall and side walls. Front is left open for viewing.
+function backWindow(x){
+ cube(x,1.30,-3.895,1.28,.83,.035,'#a9d9ed');
+ cube(x,1.73,-3.85,1.43,.09,.13,'#fffdf3');
+ cube(x,.87,-3.85,1.43,.09,.13,'#fffdf3');
+ for(const dx of [-.71,.71])cube(x+dx,1.3,-3.85,.09,.94,.13,'#fffdf3');
+ cube(x,1.3,-3.81,.065,.87,.09,'#fffdf3');
+ cube(x,1.3,-3.79,1.35,.045,.09,'#fffdf3');
+ cube(x,.82,-3.72,1.62,.09,.23,'#e7e1d5');
+}
+backWindow(-2.35);backWindow(2.6);
+// Architectural door panels (decorative: AI still uses simple movement).
+function doorPanel(x,z,angle=0){
+ const g=new THREE.Group();g.position.set(x,.08,z);g.rotation.y=angle;scene.add(g);
+ const door=new THREE.Mesh(new THREE.BoxGeometry(.7,1.58,.07),mat('#b78354'));door.position.y=.79;g.add(door);
+ for(const y of [.45,1.12]){const inset=new THREE.Mesh(new THREE.BoxGeometry(.47,.44,.085),mat('#d1a172'));inset.position.set(0,y,.045);g.add(inset)}
+ const knob=new THREE.Mesh(new THREE.SphereGeometry(.045,10,8),mat('#e9d69b'));knob.position.set(.24,.8,.09);g.add(knob);
+}
+doorPanel(-4.58,2.5,Math.PI/2);
+// Skirting boards, contrasting room boundaries, ceiling beams.
+cube(0,2.05,-3.96,10.05,.13,.20,'#544b46');
+cube(-4.97,2.05,0,.19,.13,8,'#544b46');
+cube(4.97,2.05,0,.19,.13,8,'#544b46');
+for(const x of [-4.83,4.83])cube(x,.16,0,.07,.22,7.75,'#fff6e8');
+// Kitchen countertop and sink with faucet.
+cube(3.6,.80,3.12,2.32,.09,.73,'#e8e4dc');
+cube(3.12,.851,3.12,.66,.016,.40,'#809caa');
+const faucet=cube(3.10,1.02,3.35,.05,.29,.05,'#b5c2c9');
+cube(3.18,1.16,3.35,.21,.045,.045,'#b5c2c9');
+// Dining table and small indoor plant.
+cube(1.25,.36,2.8,1.1,.11,.8,'#9c6d47');
+for(const x of [.82,1.68])for(const z of [2.5,3.1])cube(x,.17,z,.09,.34,.09,'#7b5237');
+cube(-4.35,.38,3.4,.43,.55,.43,'#c7a58b');
+const pot=new THREE.Mesh(new THREE.CylinderGeometry(.23,.17,.32,12),mat('#bd8063'));pot.position.set(-4.35,.8,3.4);scene.add(pot);
+for(let i=0;i<5;i++){const leaf=new THREE.Mesh(new THREE.SphereGeometry(.23,10,8),mat(i%2?'#367e53':'#4c9a65'));leaf.scale.set(.65,1.25,.65);leaf.position.set(-4.35+Math.sin(i*2.5)*.18,1.15+Math.cos(i*1.8)*.1,3.4+Math.cos(i*2.5)*.18);scene.add(leaf)}
+// Bathroom mirror and towel rack.
+cube(1.62,1.33,-3.86,.8,.72,.08,'#d5e7ef');
+cube(1.62,1.33,-3.79,.66,.58,.018,'#91c5d8');
+cube(4.58,.85,-2.2,.08,.07,.7,'#b7b7b9');
+cube(4.56,.60,-2.2,.09,.42,.56,'#8fc7c6');
+// Bed pillows, bedside lamp and TV screen.
+for(const x of [-3.13,-2.33])cube(x,.52,-3.25,.55,.15,.35,'#fffdf8');
+cube(-4.23,1.15,-3.15,.18,.10,.18,'#f4d8a3');
+cube(-4.2,.59,1.25,.05,.65,1.12,'#223e59');
+// Decorative wall clock on the back wall.
+const clockFace=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.055,24),mat('#f8f5ec'));
+clockFace.rotation.x=Math.PI/2;clockFace.position.set(.45,1.47,-3.81);scene.add(clockFace);
+
 const rooms={living:{x:-2.6,z:1.7},kitchen:{x:2.65,z:1.5},bedroom:{x:-2.6,z:-1.7},bathroom:{x:2.6,z:-1.6}};
 const profiles=[{name:'Dad',color:'#547fe0',hair:'#4b3326',start:'living',trait:'thoughtful and playful'},{name:'Mom',color:'#e36f9e',hair:'#593c2f',start:'kitchen',trait:'warm and practical'},{name:'Alex',color:'#e4b24e',hair:'#503427',start:'bedroom',trait:'curious and energetic'},{name:'Mia',color:'#8d7ce1',hair:'#332722',start:'living',trait:'creative and funny'}];
 const clamp=n=>Math.max(0,Math.min(100,n)),rand=(a,b)=>a+Math.random()*(b-a);
 function avatar(p,i){const root=new THREE.Group();scene.add(root);const rig=new THREE.Group();root.add(rig);const child=i>=2,scale=child?.82:1;rig.scale.setScalar(scale);const shirt=part(rig,new THREE.CapsuleGeometry(.25,.48,5,10),p.color,0,.69,0);const neck=part(rig,new THREE.CylinderGeometry(.085,.09,.14,10),'#edc09e',0,1.16,0);part(rig,new THREE.SphereGeometry(.25,18,14),'#edc09e',0,1.41,0);const hair=part(rig,new THREE.SphereGeometry(.255,18,12),p.hair,0,1.55,-.015);hair.scale.y=.52;const bangs=part(rig,new THREE.BoxGeometry(.43,.10,.13),p.hair,0,1.59,.18);for(const x of [-.095,.095]){part(rig,new THREE.SphereGeometry(.029,10,8),'#222431',x,1.43,.227);part(rig,new THREE.SphereGeometry(.018,8,6),'#e9a994',x,1.32,.215)}const smile=part(rig,new THREE.TorusGeometry(.066,.012,5,16,Math.PI),'#874d4c',0,1.31,.237);smile.rotation.z=Math.PI;const arms=[],legs=[];for(const side of [-1,1]){const arm=new THREE.Group();arm.position.set(side*.31,1.02,0);rig.add(arm);part(arm,new THREE.CapsuleGeometry(.085,.40,4,8),p.color,0,-.29,0);part(arm,new THREE.SphereGeometry(.09,10,8),'#edc09e',0,-.55,0);arms.push(arm);const leg=new THREE.Group();leg.position.set(side*.13,.45,0);rig.add(leg);part(leg,new THREE.CapsuleGeometry(.105,.35,4,8),'#45516b',0,-.22,0);part(leg,new THREE.BoxGeometry(.23,.14,.35),'#2c354b',0,-.49,.08);legs.push(leg)}root.position.set(rooms[p.start].x+rand(-.3,.3),.04,rooms[p.start].z+rand(-.3,.3));return {root,rig,arms,legs}}
 const family=profiles.map((p,i)=>({...p,...avatar(p,i),room:p.start,target:null,hunger:75-i*8,energy:75+i*5,happiness:85-i*4,action:'Exploring',nextAction:'Relaxing',timer:0,speech:'',speechUntil:0,memories:[],phase:i}));
 let minutes=420,paused=false,speed=1,uiTime=0,aiEnabled=false,aiBusy=false,lastAI=0;const status=document.querySelector('#status');
-function say(p,line){p.speech=String(line).slice(0,120);p.speechUntil=performance.now()+9500;const div=document.createElement('div');div.textContent=p.name+': “'+p.speech+'”';document.querySelector('#log').prepend(div);while(document.querySelector('#log').children.length>7)document.querySelector('#log').lastChild.remove();p.memories.push(p.speech);p.memories=p.memories.slice(-3)}
+const labelLayer=document.querySelector('#labels');
+const labels=new Map();
+for(const p of family){
+ const el=document.createElement('div');el.className='char-label';
+ const bubble=document.createElement('div');bubble.className='char-bubble';bubble.hidden=true;
+ const name=document.createElement('div');name.className='char-name';name.textContent=p.name;name.style.borderColor=p.color;
+ el.append(bubble,name);labelLayer.append(el);labels.set(p,{el,bubble});
+}
+const labelPoint=new THREE.Vector3();
+function updateLabels(){
+ for(const p of family){
+  const {el,bubble}=labels.get(p);
+  labelPoint.copy(p.root.position);labelPoint.y+=p.name==='Alex'||p.name==='Mia'?1.65:1.95;
+  labelPoint.project(camera);
+  const visible=labelPoint.z>-1&&labelPoint.z<1&&Math.abs(labelPoint.x)<1.2&&Math.abs(labelPoint.y)<1.2;
+  el.classList.toggle('offscreen',!visible);
+  if(!visible)continue;
+  el.style.left=((labelPoint.x+1)*.5*innerWidth)+'px';
+  el.style.top=((-labelPoint.y+1)*.5*innerHeight-4)+'px';
+  const talking=p.speechUntil>performance.now();
+  bubble.hidden=!talking;
+  if(talking&&bubble.textContent!==p.speech)bubble.textContent=p.speech;
+ }
+}
+const panel=document.querySelector('#panel'),minBtn=document.querySelector('#minimize');
+minBtn.onclick=()=>{
+ const collapsed=panel.classList.toggle('minimized');
+ minBtn.textContent=collapsed?'+':'−';
+ minBtn.setAttribute('aria-label',collapsed?'Expand family status':'Minimize family status');
+};
+function say(p,line){p.speech=String(line).slice(0,120);p.speechUntil=performance.now()+11500;const div=document.createElement('div');div.textContent=p.name+': “'+p.speech+'”';document.querySelector('#log').prepend(div);while(document.querySelector('#log').children.length>7)document.querySelector('#log').lastChild.remove();p.memories.push(p.speech);p.memories=p.memories.slice(-3)}
 function choose(p,forced){let room,action;if(forced){room=forced.room;action=forced.action}else if(p.energy<30){room='bedroom';action='Sleeping'}else if(p.hunger<35){room='kitchen';action='Eating'}else if(Math.random()<.15){room='bathroom';action='Bathing'}else{room=Math.random()<.55?'living':'kitchen';action=room==='living'?'Relaxing':'Cooking'}p.room=room;p.action='Walking to '+room;p.nextAction=action;const r=rooms[room];p.target=new THREE.Vector3(r.x+rand(-.6,.6),.04,r.z+rand(-.45,.45));p.timer=rand(5,10)}
-function update(dt,t){minutes+=dt*3;for(const p of family){p.hunger=clamp(p.hunger-dt*.55);p.energy=clamp(p.energy-dt*.35);p.happiness=clamp(p.happiness-dt*.12);const diff=p.target.clone().sub(p.root.position);diff.y=0;const walking=diff.length()>.09;if(walking){const move=Math.min(diff.length(),dt*1.15);diff.normalize();p.root.position.addScaledVector(diff,move);p.root.rotation.y=Math.atan2(diff.x,diff.z)}else{p.action=p.nextAction;p.timer-=dt;if(p.action==='Eating')p.hunger=clamp(p.hunger+dt*8);if(p.action==='Sleeping')p.energy=clamp(p.energy+dt*7);if(p.action==='Relaxing')p.happiness=clamp(p.happiness+dt*3);if(p.timer<=0)choose(p)}const swing=walking?Math.sin(t*.008*speed+p.phase)*.48:0;p.arms[0].rotation.x=swing;p.arms[1].rotation.x=-swing;p.legs[0].rotation.x=-swing;p.legs[1].rotation.x=swing;p.rig.position.y=walking?Math.abs(Math.sin(t*.008*speed+p.phase))*.045:0}}
+let offlineTalkTimer=0;function update(dt,t){minutes+=dt*3;offlineTalkTimer+=dt;if(!aiEnabled&&offlineTalkTimer>32){offlineTalkTimer=0;const p=family[Math.floor(Math.random()*family.length)];const lines={Dad:['Who wants to play a game?','Dinner smells wonderful!'],Mom:['How was your day?','Let’s tidy up together.'],Alex:['Can we play after lunch?','I have a fun idea!'],Mia:['Look what I made!','Can someone read with me?']};say(p,lines[p.name][Math.floor(Math.random()*2)]);} for(const p of family){p.hunger=clamp(p.hunger-dt*.55);p.energy=clamp(p.energy-dt*.35);p.happiness=clamp(p.happiness-dt*.12);const diff=p.target.clone().sub(p.root.position);diff.y=0;const walking=diff.length()>.09;if(walking){const move=Math.min(diff.length(),dt*1.15);diff.normalize();p.root.position.addScaledVector(diff,move);p.root.rotation.y=Math.atan2(diff.x,diff.z)}else{p.action=p.nextAction;p.timer-=dt;if(p.action==='Eating')p.hunger=clamp(p.hunger+dt*8);if(p.action==='Sleeping')p.energy=clamp(p.energy+dt*7);if(p.action==='Relaxing')p.happiness=clamp(p.happiness+dt*3);if(p.timer<=0)choose(p)}const swing=walking?Math.sin(t*.008*speed+p.phase)*.48:0;p.arms[0].rotation.x=swing;p.arms[1].rotation.x=-swing;p.legs[0].rotation.x=-swing;p.legs[1].rotation.x=swing;p.rig.position.y=walking?Math.abs(Math.sin(t*.008*speed+p.phase))*.045:0}}
 function ui(){const h=Math.floor(minutes/60)%24,m=Math.floor(minutes%60);document.querySelector('#clock').textContent=`Day ${Math.floor(minutes/1440)+1} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;document.querySelector('#family').innerHTML=family.map(p=>`<div class="person"><div><b style="color:${p.color}">●</b> ${p.name}<br><small>${p.action}</small>${p.speechUntil>performance.now()?`<div class="talk">💬 ${escapeHTML(p.speech)}</div>`:''}</div><div class="stats">🍽 ${Math.round(p.hunger)} · ⚡ ${Math.round(p.energy)}<div class="bar"><span style="width:${p.happiness}%"></span></div></div></div>`).join('')}
 function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const allowedRooms=Object.keys(rooms),allowedActions=['Eating','Sleeping','Relaxing','Cooking','Bathing','Talking','Playing','Reading'];
 async function askGemini(){if(!aiEnabled||aiBusy||paused)return;const endpoint=document.querySelector('#endpoint').value.trim();if(!/^https:\/\/[^\s/]+\.workers\.dev\/?$/.test(endpoint)){status.textContent='Set a valid HTTPS Worker URL';aiEnabled=false;document.querySelector('#ai').textContent='Enable Gemini';return}aiBusy=true;status.textContent='Gemini thinking…';const payload={time:`${Math.floor(minutes/60)%24}:${String(Math.floor(minutes%60)).padStart(2,'0')}`,family:family.map(p=>({name:p.name,trait:p.trait,room:p.room,action:p.action,hunger:Math.round(p.hunger),energy:Math.round(p.energy),happiness:Math.round(p.happiness),memories:p.memories}))};try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),18000);let response;try{response=await fetch(endpoint.replace(/\/$/,''),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal})}finally{clearTimeout(timeout)}if(!response.ok)throw new Error('Worker HTTP '+response.status);const result=await response.json();if(!result||typeof result.character!=='string')throw new Error('Unexpected AI response');for(const d of [result]){const p=family.find(x=>x.name===d.character);if(!p||!allowedRooms.includes(d.room)||!allowedActions.includes(d.action))continue;choose(p,{room:d.room,action:d.action});if(typeof d.dialogue==='string'&&d.dialogue.trim())say(p,d.dialogue)}status.textContent='Gemini connected ✓'}catch(e){status.textContent='AI unavailable; offline mode continues';console.warn('Gemini request:',e)}finally{aiBusy=false}}
-function animate(t){requestAnimationFrame(animate);const dt=Math.min((t-(animate.last||t))/1000,.05);animate.last=t;if(!paused)update(dt*speed,t);orbit.update();renderer.render(scene,camera);uiTime+=dt;if(uiTime>.25){ui();uiTime=0}if(aiEnabled&&!paused&&!aiBusy&&t-lastAI>30000){lastAI=t;askGemini()}}
+function animate(t){requestAnimationFrame(animate);const dt=Math.min((t-(animate.last||t))/1000,.05);animate.last=t;if(!paused)update(dt*speed,t);orbit.update();renderer.render(scene,camera);updateLabels();uiTime+=dt;if(uiTime>.25){ui();uiTime=0}if(aiEnabled&&!paused&&!aiBusy&&t-lastAI>30000){lastAI=t;askGemini()}}
 family.forEach(p=>choose(p));say(family[0],'Good morning, everyone!');ui();requestAnimationFrame(animate);
 document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'▶ Play':'⏸ Pause'};document.querySelector('#speed').onclick=e=>{speed=speed===1?3:speed===3?6:1;e.target.textContent=speed+'× Speed'};document.querySelector('#reset').onclick=()=>location.reload();
 document.querySelector('#connect').onclick=()=>{const url=document.querySelector('#endpoint').value.trim();if(!/^https:\/\/[^\s/]+\.workers\.dev\/?$/.test(url)){status.textContent='Enter a valid HTTPS *.workers.dev URL';return}status.textContent='Endpoint set. Click Enable Gemini.';document.querySelector('#config').open=false};
