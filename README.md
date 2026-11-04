@@ -1,9 +1,23 @@
-# Little Lives V4 — Four AI Family Members
+# Little Lives V5 — Roblox-inspired Family Simulator
 
-1. Replace GitHub repository `Reformat15/little-lives` main branch `index.html` with this file. Commit and wait for GitHub Pages.
-2. In Cloudflare Workers > little-lives-ai > Edit code, replace existing Worker with `worker.js`, then Deploy.
-3. Keep existing Cloudflare secret `GEMINI_API_KEY` and variable `ALLOWED_ORIGIN=https://reformat15.github.io`. Never paste the API key into HTML or GitHub.
-4. On the website, expand Gemini connection settings, enter the HTTPS Worker URL, Save endpoint, then Enable Gemini.
-5. Gemini now generates connected 3–4 turn conversations with at least 3 family members, played sequentially as speech bubbles. One API call is made about every 42 seconds when enabled and not already playing dialogue. Free tier quotas vary.
+## Install
+1. In GitHub repository `Reformat15/little-lives`, edit **main/index.html**, replace all existing content with this package's `index.html`, and commit.
+2. Wait for GitHub Pages deployment to succeed. Reload `https://reformat15.github.io/little-lives/`.
+3. In Cloudflare Workers, open your existing `little-lives-ai` Worker, select **Edit code**, replace the code with `worker.js`, and **Deploy**.
+4. Under Cloudflare **Settings → Variables and Secrets**, retain `GEMINI_API_KEY` as a **Secret** and `ALLOWED_ORIGIN` as `https://reformat15.github.io`.
+5. On the website, open **Gemini connection settings**, paste the exact `https://...workers.dev` address, click **Save endpoint**, and **Enable Gemini**. If HTTPS still fails in Chrome, fix the public Worker domain/TLS before enabling.
 
-This is simulated agent behavior generated in one Gemini call, not four separately hosted models. Existing house, name labels, speech bubbles, minimize button and controls are retained. Public Workers need rate limiting or authentication before broad release; origin checking alone is not abuse protection.
+## Features
+- Roblox-inspired blocky family avatars: Dad, Mom, Alex, Mia.
+- Walking animation, floating name tags and speech bubbles.
+- Detailed open-top house with room decorations and furnishings.
+- Minimize family status panel, pause, speed and reset.
+- Offline family conversations with **real replies**, one turn at a time, even without Gemini.
+- Optional Gemini-generated connected multi-person conversations via Cloudflare Worker.
+
+## Notes
+- Only one Gemini model call is used for a whole scene; four fictional characters are simulated, not four independent model processes.
+- The Worker keeps the API key server-side but its public URL is **not access-controlled**: CORS and an Origin check are not authentication. Before public launch, add Cloudflare rate limits, request quotas, abuse protections, and usage monitoring.
+- Conversation memory is in-page and resets on reload; no long-term database yet.
+- The models are procedural and Roblox-inspired; no Roblox assets or engine are required.
+- Three.js is loaded from jsDelivr, so the site needs an internet connection.
