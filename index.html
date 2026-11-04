@@ -1,20 +1,20 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Little Lives V4 — AI Family Conversations</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Little Lives V5 — Family Life</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E🏠%3C/text%3E%3C/svg%3E">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101827;color:#f1f5ff;font:14px system-ui,Arial;overflow:hidden}#scene{position:fixed;inset:0}#panel{position:fixed;top:14px;left:14px;width:min(328px,calc(100vw - 28px));max-height:calc(100vh - 105px);overflow:auto;padding:14px;background:#101d32ee;border:1px solid #40516c;border-radius:16px;backdrop-filter:blur(10px)}h1{margin:0;font-size:20px}.sub{font-size:12px;color:#afc0dc;margin:4px 0 10px}.person{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #30405a}.person small{color:#b9c7de}.stats{text-align:right;min-width:98px;font-size:12px}.bar{height:5px;background:#34435a;border-radius:9px;margin-top:5px;overflow:hidden}.bar span{display:block;height:100%;background:#7fe2b8}.talk{font-size:12px;color:#f4d99c;margin-top:4px;max-width:170px}.controls{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:7px;padding:8px;background:#101d32e8;border:1px solid #40516c;border-radius:14px}button{background:#6268eb;color:#fff;border:0;border-radius:9px;padding:10px 12px;font-weight:700;cursor:pointer;white-space:nowrap}button:hover{background:#7c81fa}button:disabled{opacity:.55;cursor:default}#hint{position:fixed;right:15px;top:14px;color:#bac8de;font-size:12px;text-align:right}#status{font-size:12px;color:#a8b8d2;margin-top:8px}#log{font-size:12px;line-height:1.5;color:#dbe4f7;max-height:90px;overflow:auto}#log div{margin:4px 0}.airow{display:flex;gap:7px;align-items:center;margin:10px 0 4px}#error{position:fixed;bottom:80px;left:12px;right:12px;display:none;background:#722c3c;padding:12px;border-radius:10px}#config{margin-top:10px;padding-top:8px;border-top:1px solid #40516c}input{width:100%;background:#1c2c45;border:1px solid #526582;border-radius:8px;padding:9px;color:white;margin-top:6px}label{font-size:12px;color:#c5d1e5}#config button{margin-top:7px}#config summary{cursor:pointer;font-size:12px;color:#d4dafa}#badge{font-size:12px;color:#98f0bd} @media(max-width:680px){#panel{width:250px;padding:10px;max-height:55vh}#hint{top:auto;bottom:80px}button{padding:9px}h1{font-size:17px}.controls{max-width:98vw}}
 
-#panel{z-index:6;transition:width .2s ease}#panel h1{padding-right:38px}#minimize{position:absolute;top:9px;right:9px;padding:5px 11px;background:#304463;font-size:20px;line-height:1.1}#panel.minimized{width:192px;max-height:none;overflow:hidden}#panel.minimized #panelBody{display:none}#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:3}.char-label{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:4px;max-width:190px;will-change:transform,left,top}.char-name{font-size:12px;font-weight:800;color:white;background:#17263bdc;border:1px solid #8a9cb7a0;padding:3px 9px;border-radius:20px;box-shadow:0 3px 10px #0005;white-space:nowrap}.char-bubble{font-size:12px;line-height:1.3;background:#fffdf3;color:#283044;border-radius:13px;padding:8px 11px;box-shadow:0 5px 18px #0005;max-width:190px;text-align:center;overflow-wrap:anywhere;position:relative}.char-bubble:after{content:'';position:absolute;left:calc(50% - 6px);bottom:-6px;width:12px;height:12px;transform:rotate(45deg);background:#fffdf3}.char-label.offscreen{display:none}@media(max-width:680px){#panel{max-height:48vh;width:min(265px,calc(100vw - 25px))}#panel.minimized{width:160px}#panel h1{font-size:16px}.char-bubble{font-size:11px;max-width:135px}.char-name{font-size:11px}#hint{font-size:10px}}
+#panel{z-index:6;transition:width .2s ease}#panel h1{padding-right:38px}#minimize{position:absolute;top:9px;right:9px;padding:5px 11px;background:#304463;font-size:20px;line-height:1.1}#panel.minimized{width:192px;max-height:none;overflow:hidden}#panel.minimized #panelBody{display:none}#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:3}.char-label{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:4px;max-width:190px;will-change:transform,left,top}.char-name{font-size:12px;font-weight:800;color:white;background:#17263bdc;border:1px solid #8a9cb7a0;padding:3px 9px;border-radius:20px;box-shadow:0 3px 10px #0005;white-space:nowrap}.char-bubble{font-size:12px;line-height:1.3;background:#fffdf3;color:#283044;border-radius:13px;padding:8px 11px;box-shadow:0 5px 18px #0005;max-width:190px;text-align:center;overflow-wrap:anywhere;position:relative}.char-bubble:after{content:'';position:absolute;left:calc(50% - 6px);bottom:-6px;width:12px;height:12px;transform:rotate(45deg);background:#fffdf3}.char-label.offscreen{display:none}@media(max-width:680px){#panel{max-height:43vh;width:min(265px,calc(100vw - 25px))}#panel.minimized{width:160px}#panel h1{font-size:16px}.char-bubble{font-size:11px;max-width:135px}.char-name{font-size:11px}#hint{font-size:10px}}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-</head><body><div id="scene"></div><aside id="panel"><h1>🏠 Little Lives <span id="badge">V4</span></h1><button id="minimize" type="button" aria-label="Minimize family status">−</button><div id="panelBody"><div id="clock" class="sub">Loading...</div><div id="family"></div><div class="airow"><button id="ai">Enable Gemini</button><span id="status">Offline brains active</span></div><details id="config"><summary>Gemini connection settings</summary><label for="endpoint">Cloudflare Worker endpoint (never enter an API key here)</label><input id="endpoint" placeholder="https://little-lives-ai.YOUR-NAME.workers.dev"><button id="connect">Save endpoint</button><p class="sub">The browser sends family state to your Worker. AI is optional; the simulation works without it.</p></details><div class="sub">Family conversations · four personalities</div><div id="log" aria-live="polite"></div></div></aside><div id="labels" aria-hidden="true"></div><div id="hint">Drag to rotate · Scroll / pinch to zoom</div><div class="controls"><button id="pause">⏸ Pause</button><button id="speed">1× Speed</button><button id="reset">↺ Reset</button></div><div id="error"></div>
+</head><body><div id="scene"></div><aside id="panel"><h1>🏠 Little Lives <span id="badge">V5</span></h1><button id="minimize" type="button" aria-label="Minimize family status">−</button><div id="panelBody"><div id="clock" class="sub">Loading...</div><div id="family"></div><div class="airow"><button id="ai">Enable Gemini</button><span id="status">Offline brains active</span></div><details id="config"><summary>Gemini connection settings</summary><label for="endpoint">Cloudflare Worker endpoint (never enter an API key here)</label><input id="endpoint" placeholder="https://little-lives-ai.YOUR-NAME.workers.dev"><button id="connect">Save endpoint</button><p class="sub">The browser sends family state to your Worker. AI is optional; the simulation works without it.</p></details><div class="sub">Family conversations · four personalities</div><div id="log" aria-live="polite"></div></div></aside><div id="labels" aria-hidden="true"></div><div id="hint">Drag to rotate · Scroll / pinch to zoom</div><div class="controls"><button id="pause">⏸ Pause</button><button id="speed">1× Speed</button><button id="reset">↺ Reset</button></div><div id="error"></div>
 <script type="module">
 import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 try{
 const scene=new THREE.Scene();scene.background=new THREE.Color('#101827');const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,100);camera.position.set(12,16,17);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.querySelector('#scene').appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.querySelector('#scene').appendChild(renderer.domElement);
 const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(0,0,0);orbit.enableDamping=true;orbit.minDistance=9;orbit.maxDistance=34;orbit.maxPolarAngle=Math.PI/2.06;orbit.update();
-scene.add(new THREE.HemisphereLight(0xffffff,0x6d7790,2));const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(-5,12,7);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-12;sun.shadow.camera.right=12;sun.shadow.camera.top=12;sun.shadow.camera.bottom=-12;scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xffffff,0x6d7790,2));const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(-5,12,7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-12;sun.shadow.camera.right=12;sun.shadow.camera.top=12;sun.shadow.camera.bottom=-12;scene.add(sun);
 const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.85});
 function cube(x,y,z,w,h,d,c){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
 function part(group,shape,c,x,y,z){const o=new THREE.Mesh(shape,mat(c));o.position.set(x,y,z);o.castShadow=true;group.add(o);return o}
@@ -76,12 +76,62 @@ cube(-4.2,.59,1.25,.05,.65,1.12,'#223e59');
 const clockFace=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.055,24),mat('#f8f5ec'));
 clockFace.rotation.x=Math.PI/2;clockFace.position.set(.45,1.47,-3.81);scene.add(clockFace);
 
+// V5 dollhouse details: exterior porch, walkway, room lights, framed art, bookcase and kitchen cabinets.
+cube(0,-.30,4.58,3.2,.12,1.05,'#9d9fa6');
+for(let n=0;n<5;n++)cube(-1.35+n*.68,-.235,4.72,.48,.025,.35,'#c6b9a5');
+for(const x of [-4.90,4.90])cube(x,1.98,0,.14,.11,7.95,'#3f4a55');
+cube(0,1.99,-3.95,10,.10,.19,'#3f4a55');
+// Living-room media cabinet and bookshelves.
+cube(-4.42,.47,.05,.72,.87,.48,'#98745b');
+for(let n=0;n<3;n++)cube(-4.42,.29+n*.28,.33,.62,.05,.10,'#d5b392');
+for(let n=0;n<5;n++)cube(-4.68+n*.12,.79,.35,.075,.25,.08,['#4b78ac','#d98064','#e0c276'][n%3]);
+// Kitchen backsplash and cupboard doors.
+cube(3.60,1.09,3.84,2.1,.43,.06,'#f5eee2');
+for(const x of [2.85,3.55,4.25]){
+ cube(x,1.64,3.83,.62,.52,.20,'#a5c5c3');
+ cube(x+.20,1.62,3.70,.025,.04,.025,'#d8e6e3');
+}
+// Decorative ceiling-less pendant lights.
+for(const [x,z] of [[-2.4,1.7],[2.6,1.7],[-2.5,-1.7],[2.6,-1.7]]){
+ const light=new THREE.PointLight('#ffe6b9',.32,3.8);light.position.set(x,2.15,z);scene.add(light);
+}
+// Bedroom wardrobe and bathroom mat.
+cube(-4.35,.75,-1.5,.7,1.45,.65,'#aa8269');
+cube(2.8,.055,-1.4,1.15,.025,.55,'#a9c7d6');
 const rooms={living:{x:-2.6,z:1.7},kitchen:{x:2.65,z:1.5},bedroom:{x:-2.6,z:-1.7},bathroom:{x:2.6,z:-1.6}};
 const profiles=[{name:'Dad',color:'#547fe0',hair:'#4b3326',start:'living',trait:'thoughtful and playful'},{name:'Mom',color:'#e36f9e',hair:'#593c2f',start:'kitchen',trait:'warm and practical'},{name:'Alex',color:'#e4b24e',hair:'#503427',start:'bedroom',trait:'curious and energetic'},{name:'Mia',color:'#8d7ce1',hair:'#332722',start:'living',trait:'creative and funny'}];
 const clamp=n=>Math.max(0,Math.min(100,n)),rand=(a,b)=>a+Math.random()*(b-a);
-function avatar(p,i){const root=new THREE.Group();scene.add(root);const rig=new THREE.Group();root.add(rig);const child=i>=2,scale=child?.82:1;rig.scale.setScalar(scale);const shirt=part(rig,new THREE.CapsuleGeometry(.25,.48,5,10),p.color,0,.69,0);const neck=part(rig,new THREE.CylinderGeometry(.085,.09,.14,10),'#edc09e',0,1.16,0);part(rig,new THREE.SphereGeometry(.25,18,14),'#edc09e',0,1.41,0);const hair=part(rig,new THREE.SphereGeometry(.255,18,12),p.hair,0,1.55,-.015);hair.scale.y=.52;const bangs=part(rig,new THREE.BoxGeometry(.43,.10,.13),p.hair,0,1.59,.18);for(const x of [-.095,.095]){part(rig,new THREE.SphereGeometry(.029,10,8),'#222431',x,1.43,.227);part(rig,new THREE.SphereGeometry(.018,8,6),'#e9a994',x,1.32,.215)}const smile=part(rig,new THREE.TorusGeometry(.066,.012,5,16,Math.PI),'#874d4c',0,1.31,.237);smile.rotation.z=Math.PI;const arms=[],legs=[];for(const side of [-1,1]){const arm=new THREE.Group();arm.position.set(side*.31,1.02,0);rig.add(arm);part(arm,new THREE.CapsuleGeometry(.085,.40,4,8),p.color,0,-.29,0);part(arm,new THREE.SphereGeometry(.09,10,8),'#edc09e',0,-.55,0);arms.push(arm);const leg=new THREE.Group();leg.position.set(side*.13,.45,0);rig.add(leg);part(leg,new THREE.CapsuleGeometry(.105,.35,4,8),'#45516b',0,-.22,0);part(leg,new THREE.BoxGeometry(.23,.14,.35),'#2c354b',0,-.49,.08);legs.push(leg)}root.position.set(rooms[p.start].x+rand(-.3,.3),.04,rooms[p.start].z+rand(-.3,.3));return {root,rig,arms,legs}}
+function avatar(p,i){
+ const root=new THREE.Group();scene.add(root);const rig=new THREE.Group();root.add(rig);
+ const kid=i>=2,scale=kid?.82:1;rig.scale.setScalar(scale);
+ const skin=i===0?'#d6a17b':i===1?'#edb994':i===2?'#d9a77d':'#efc5a3';
+ const pants=i===1?'#343f68':i===3?'#6d548f':'#263d66';
+ const torso=part(rig,new THREE.BoxGeometry(.66,.64,.36),p.color,0,.93,0);
+ part(rig,new THREE.BoxGeometry(.16,.12,.19),skin,0,1.32,0);
+ const head=part(rig,new THREE.BoxGeometry(.51,.49,.47),skin,0,1.57,0);
+ // Angular hair, with individual silhouettes for each family member.
+ part(rig,new THREE.BoxGeometry(.56,.15,.51),p.hair,0,1.85,0);
+ if(i===1||i===3){for(const side of [-1,1])part(rig,new THREE.BoxGeometry(.12,.32,.43),p.hair,side*.28,1.64,-.02)}
+ else part(rig,new THREE.BoxGeometry(.30,.10,.14),p.hair,-.08,1.76,.24);
+ for(const x of [-.115,.115]){
+   part(rig,new THREE.BoxGeometry(.048,.065,.014),'#232334',x,1.60,.243);
+   part(rig,new THREE.BoxGeometry(.023,.02,.018),'#fff',x-.009,1.615,.255);
+ }
+ const mouth=part(rig,new THREE.BoxGeometry(.15,.022,.018),'#7b4b4a',0,1.44,.243);
+ const arms=[],legs=[];
+ for(const side of [-1,1]){
+   const arm=new THREE.Group();arm.position.set(side*.43,1.17,0);rig.add(arm);
+   part(arm,new THREE.BoxGeometry(.23,.39,.29),p.color,0,-.20,0);
+   part(arm,new THREE.BoxGeometry(.21,.17,.25),skin,0,-.47,0);arms.push(arm);
+   const leg=new THREE.Group();leg.position.set(side*.17,.60,0);rig.add(leg);
+   part(leg,new THREE.BoxGeometry(.29,.49,.33),pants,0,-.25,0);
+   part(leg,new THREE.BoxGeometry(.30,.14,.42),'#222b3e',0,-.54,.055);legs.push(leg);
+ }
+ root.position.set(rooms[p.start].x+rand(-.3,.3),.04,rooms[p.start].z+rand(-.3,.3));
+ return {root,rig,arms,legs,mouth};
+}
 const family=profiles.map((p,i)=>({...p,...avatar(p,i),room:p.start,target:null,hunger:75-i*8,energy:75+i*5,happiness:85-i*4,action:'Exploring',nextAction:'Relaxing',timer:0,speech:'',speechUntil:0,memories:[],phase:i}));
-let minutes=420,paused=false,speed=1,uiTime=0,aiEnabled=false,aiBusy=false,lastAI=0;let conversation=[],dialogueQueue=[],nextLineAt=0;const status=document.querySelector('#status');
+let minutes=420,paused=false,speed=1,uiTime=0,aiEnabled=false,aiBusy=false,lastAI=0;let conversation=[],dialogueQueue=[],nextLineAt=0,offlineTalkTimer=0,sceneNumber=0;const status=document.querySelector('#status');
 const labelLayer=document.querySelector('#labels');
 const labels=new Map();
 for(const p of family){
@@ -114,7 +164,45 @@ minBtn.onclick=()=>{
 };
 function say(p,line){p.speech=String(line).slice(0,160);p.speechUntil=performance.now()+11500;const div=document.createElement('div');div.textContent=p.name+': “'+p.speech+'”';document.querySelector('#log').prepend(div);while(document.querySelector('#log').children.length>7)document.querySelector('#log').lastChild.remove();p.memories.push(p.speech);p.memories=p.memories.slice(-5);conversation.push({speaker:p.name,text:p.speech});conversation=conversation.slice(-16)}
 function choose(p,forced){let room,action;if(forced){room=forced.room;action=forced.action}else if(p.energy<30){room='bedroom';action='Sleeping'}else if(p.hunger<35){room='kitchen';action='Eating'}else if(Math.random()<.15){room='bathroom';action='Bathing'}else{room=Math.random()<.55?'living':'kitchen';action=room==='living'?'Relaxing':'Cooking'}p.room=room;p.action='Walking to '+room;p.nextAction=action;const r=rooms[room];p.target=new THREE.Vector3(r.x+rand(-.6,.6),.04,r.z+rand(-.45,.45));p.timer=rand(5,10)}
-let offlineTalkTimer=0;function update(dt,t){minutes+=dt*3;offlineTalkTimer+=dt;if(!aiEnabled&&offlineTalkTimer>32){offlineTalkTimer=0;const p=family[Math.floor(Math.random()*family.length)];const lines={Dad:['Who wants to play a game?','Dinner smells wonderful!'],Mom:['How was your day?','Let’s tidy up together.'],Alex:['Can we play after lunch?','I have a fun idea!'],Mia:['Look what I made!','Can someone read with me?']};say(p,lines[p.name][Math.floor(Math.random()*2)]);} for(const p of family){p.hunger=clamp(p.hunger-dt*.55);p.energy=clamp(p.energy-dt*.35);p.happiness=clamp(p.happiness-dt*.12);const diff=p.target.clone().sub(p.root.position);diff.y=0;const walking=diff.length()>.09;if(walking){const move=Math.min(diff.length(),dt*1.15);diff.normalize();p.root.position.addScaledVector(diff,move);p.root.rotation.y=Math.atan2(diff.x,diff.z)}else{p.action=p.nextAction;p.timer-=dt;if(p.action==='Eating')p.hunger=clamp(p.hunger+dt*8);if(p.action==='Sleeping')p.energy=clamp(p.energy+dt*7);if(p.action==='Relaxing')p.happiness=clamp(p.happiness+dt*3);if(p.timer<=0)choose(p)}const swing=walking?Math.sin(t*.008*speed+p.phase)*.48:0;p.arms[0].rotation.x=swing;p.arms[1].rotation.x=-swing;p.legs[0].rotation.x=-swing;p.legs[1].rotation.x=swing;p.rig.position.y=walking?Math.abs(Math.sin(t*.008*speed+p.phase))*.045:0}}
+// Offline conversations are linked mini-scenes, not unrelated random one-liners.
+// The queue is shared by offline and Gemini so speakers respond in sequence.
+const offlineScenes=[
+ [{character:'Mia',room:'living',action:'Talking',dialogue:'Can someone read a story with me?'},{character:'Dad',room:'living',action:'Talking',dialogue:'Of course, Mia. Which story would you like?'},{character:'Mia',room:'living',action:'Talking',dialogue:'The one with the dragon who is afraid of flying!'},{character:'Alex',room:'living',action:'Talking',dialogue:'I love that one. Can I listen too?'},{character:'Mom',room:'living',action:'Talking',dialogue:'I will join you after I make some tea.'}],
+ [{character:'Alex',room:'kitchen',action:'Talking',dialogue:'Mom, what are we having for dinner?'},{character:'Mom',room:'kitchen',action:'Cooking',dialogue:'I was thinking of pasta. Want to help me?'},{character:'Alex',room:'kitchen',action:'Talking',dialogue:'Yes! Can I stir the sauce?'},{character:'Dad',room:'kitchen',action:'Talking',dialogue:'I can set the table while you two cook.'},{character:'Mia',room:'kitchen',action:'Talking',dialogue:'I will bring the napkins!'}],
+ [{character:'Dad',room:'living',action:'Talking',dialogue:'How did everyone sleep last night?'},{character:'Mia',room:'living',action:'Talking',dialogue:'I dreamed our house was on the moon!'},{character:'Mom',room:'living',action:'Talking',dialogue:'That sounds amazing. Was there a garden?'},{character:'Mia',room:'living',action:'Talking',dialogue:'Yes, with purple flowers and tiny aliens!'},{character:'Alex',room:'living',action:'Talking',dialogue:'Next time, take me on your moon adventure.'}],
+ [{character:'Mom',room:'living',action:'Talking',dialogue:'Should we plan something fun for the weekend?'},{character:'Alex',room:'living',action:'Talking',dialogue:'Can we go to the park and play soccer?'},{character:'Dad',room:'living',action:'Talking',dialogue:'That sounds good. We can pack a picnic.'},{character:'Mia',room:'living',action:'Talking',dialogue:'Can I bring my teddy bear?'},{character:'Mom',room:'living',action:'Talking',dialogue:'Absolutely. Teddy can come on the picnic too.'}],
+ [{character:'Alex',room:'living',action:'Talking',dialogue:'Dad, I need help with my homework.'},{character:'Dad',room:'living',action:'Talking',dialogue:'Sure, Alex. What part is confusing?'},{character:'Alex',room:'living',action:'Talking',dialogue:'The fractions. They keep mixing me up.'},{character:'Mom',room:'living',action:'Talking',dialogue:'We can use slices of pizza to explain them.'},{character:'Mia',room:'living',action:'Talking',dialogue:'I volunteer to eat the pizza!'}]
+];
+function queueOfflineScene(){
+ if(dialogueQueue.length||aiBusy)return;
+ const scene=offlineScenes[sceneNumber++%offlineScenes.length];
+ dialogueQueue.push(...scene);nextLineAt=0;
+ status.textContent='Offline family conversation';
+}
+function update(dt,t){
+ minutes+=dt*3;
+ offlineTalkTimer+=dt;
+ if(!aiEnabled&&!dialogueQueue.length&&offlineTalkTimer>16){offlineTalkTimer=0;queueOfflineScene()}
+ for(const p of family){
+  p.hunger=clamp(p.hunger-dt*.55);p.energy=clamp(p.energy-dt*.35);p.happiness=clamp(p.happiness-dt*.12);
+  if(!p.target)choose(p);
+  const diff=p.target.clone().sub(p.root.position);diff.y=0;
+  const walking=diff.length()>.09;
+  if(walking){const move=Math.min(diff.length(),dt*1.15);diff.normalize();p.root.position.addScaledVector(diff,move);p.root.rotation.y=Math.atan2(diff.x,diff.z)}
+  else{p.action=p.nextAction;p.timer-=dt;
+   if(p.action==='Eating')p.hunger=clamp(p.hunger+dt*8);
+   if(p.action==='Sleeping')p.energy=clamp(p.energy+dt*7);
+   if(p.action==='Relaxing'||p.action==='Talking'||p.action==='Playing')p.happiness=clamp(p.happiness+dt*2.5);
+   if(p.timer<=0)choose(p);
+  }
+  const swing=walking?Math.sin(t*.008*speed+p.phase)*.60:0;
+  p.arms[0].rotation.x=swing;p.arms[1].rotation.x=-swing;
+  p.legs[0].rotation.x=-swing;p.legs[1].rotation.x=swing;
+  if(!walking&&p.speechUntil>performance.now())p.arms[0].rotation.z=-.22+Math.sin(t*.01)*.16;
+  else p.arms[0].rotation.z=0;
+  p.rig.position.y=walking?Math.abs(Math.sin(t*.008*speed+p.phase))*.05:0;
+ }
+}
 function ui(){const h=Math.floor(minutes/60)%24,m=Math.floor(minutes%60);document.querySelector('#clock').textContent=`Day ${Math.floor(minutes/1440)+1} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;document.querySelector('#family').innerHTML=family.map(p=>`<div class="person"><div><b style="color:${p.color}">●</b> ${p.name}<br><small>${p.action}</small>${p.speechUntil>performance.now()?`<div class="talk">💬 ${escapeHTML(p.speech)}</div>`:''}</div><div class="stats">🍽 ${Math.round(p.hunger)} · ⚡ ${Math.round(p.energy)}<div class="bar"><span style="width:${p.happiness}%"></span></div></div></div>`).join('')}
 function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const allowedRooms=Object.keys(rooms),allowedActions=['Eating','Sleeping','Relaxing','Cooking','Bathing','Talking','Playing','Reading'];
@@ -125,9 +213,9 @@ function playDialogue(t){
  const d=dialogueQueue.shift();const p=family.find(x=>x.name===d.character);
  if(p){
    if(allowedRooms.includes(d.room)&&allowedActions.includes(d.action))choose(p,{room:d.room,action:d.action});
-   if(d.dialogue)say(p,d.dialogue);
+   if(d.dialogue)say(p,d.dialogue);const listener=family.find(x=>x.name===dialogueQueue[0]?.character);if(listener&&listener!==p){const direction=listener.root.position.clone().sub(p.root.position);p.root.rotation.y=Math.atan2(direction.x,direction.z)}
  }
- nextLineAt=t+Math.max(3500,Math.min(8500,(d.dialogue||'').length*85));
+ nextLineAt=t+Math.max(4300,Math.min(8500,(d.dialogue||'').length*85));
 }
 async function askGemini(){
  if(!aiEnabled||aiBusy||paused||dialogueQueue.length)return;
@@ -149,17 +237,17 @@ async function askGemini(){
   if(!response.ok)throw new Error('Worker HTTP '+response.status);
   const result=await response.json();
   const turns=Array.isArray(result.turns)?result.turns:(result.character?[result]:[]);
-  const valid=turns.filter(d=>d&&family.some(p=>p.name===d.character)&&typeof d.dialogue==='string'&&d.dialogue.trim()&&allowedRooms.includes(d.room)&&allowedActions.includes(d.action)).slice(0,4);
+  const valid=turns.filter(d=>d&&family.some(p=>p.name===d.character)&&typeof d.dialogue==='string'&&d.dialogue.trim()&&allowedRooms.includes(d.room)&&allowedActions.includes(d.action)).slice(0,6);
   if(!valid.length)throw new Error('Unexpected AI response');
   dialogueQueue.push(...valid);nextLineAt=0;status.textContent='Four AI personalities active ✓';
  }catch(e){status.textContent='AI unavailable; offline mode continues';console.warn('Gemini request:',e)}
  finally{aiBusy=false;lastAI=performance.now()}
 }
 function animate(t){requestAnimationFrame(animate);const dt=Math.min((t-(animate.last||t))/1000,.05);animate.last=t;if(!paused)update(dt*speed,t);orbit.update();renderer.render(scene,camera);updateLabels();playDialogue(t);uiTime+=dt;if(uiTime>.25){ui();uiTime=0}if(aiEnabled&&!paused&&!aiBusy&&!dialogueQueue.length&&t-lastAI>42000){lastAI=t;askGemini()}}
-family.forEach(p=>choose(p));say(family[0],'Good morning, everyone!');ui();requestAnimationFrame(animate);
+family.forEach(p=>choose(p));queueOfflineScene();ui();requestAnimationFrame(animate);
 document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'▶ Play':'⏸ Pause'};document.querySelector('#speed').onclick=e=>{speed=speed===1?3:speed===3?6:1;e.target.textContent=speed+'× Speed'};document.querySelector('#reset').onclick=()=>location.reload();
 document.querySelector('#connect').onclick=()=>{const url=document.querySelector('#endpoint').value.trim();if(!/^https:\/\/[^\s/]+\.workers\.dev\/?$/.test(url)){status.textContent='Enter a valid HTTPS *.workers.dev URL';return}status.textContent='Endpoint set. Click Enable Gemini.';document.querySelector('#config').open=false};
-document.querySelector('#ai').onclick=e=>{aiEnabled=!aiEnabled;e.target.textContent=aiEnabled?'Disable Gemini':'Enable Gemini';if(aiEnabled){lastAI=performance.now();askGemini()}else{dialogueQueue.length=0;status.textContent='Offline brains active'}};
+document.querySelector('#ai').onclick=e=>{aiEnabled=!aiEnabled;e.target.textContent=aiEnabled?'Disable Gemini':'Enable Gemini';if(aiEnabled){dialogueQueue.length=0;lastAI=performance.now();askGemini()}else{dialogueQueue.length=0;offlineTalkTimer=17;status.textContent='Offline brains active'}};
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 }catch(err){console.error(err);const el=document.querySelector('#error');el.style.display='block';el.textContent='3D rendering error: '+err.message}
 </script></body></html>
