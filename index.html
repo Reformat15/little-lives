@@ -7,7 +7,7 @@
 #panel{z-index:6;transition:width .2s ease}#panel h1{padding-right:38px}#minimize{position:absolute;top:9px;right:9px;padding:5px 11px;background:#304463;font-size:20px;line-height:1.1}#panel.minimized{width:192px;max-height:none;overflow:hidden}#panel.minimized #panelBody{display:none}#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:3}.char-label{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:4px;max-width:190px;will-change:transform,left,top}.char-name{font-size:12px;font-weight:800;color:white;background:#17263bdc;border:1px solid #8a9cb7a0;padding:3px 9px;border-radius:20px;box-shadow:0 3px 10px #0005;white-space:nowrap}.char-bubble{font-size:12px;line-height:1.3;background:#fffdf3;color:#283044;border-radius:13px;padding:8px 11px;box-shadow:0 5px 18px #0005;max-width:190px;text-align:center;overflow-wrap:anywhere;position:relative}.char-bubble:after{content:'';position:absolute;left:calc(50% - 6px);bottom:-6px;width:12px;height:12px;transform:rotate(45deg);background:#fffdf3}.char-label.offscreen{display:none}@media(max-width:680px){#panel{max-height:43vh;width:min(265px,calc(100vw - 25px))}#panel.minimized{width:160px}#panel h1{font-size:16px}.char-bubble{font-size:11px;max-width:135px}.char-name{font-size:11px}#hint{font-size:10px}}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script>
-</head><body><div id="scene"></div><aside id="panel"><h1>🏠 Little Lives <span id="badge">V5.2</span></h1><button id="minimize" type="button" aria-label="Minimize family status">−</button><div id="panelBody"><div id="clock" class="sub">Loading...</div><div id="family"></div><div class="airow"><button id="ai">Enable Gemini</button><span id="status">Offline brains active</span></div><details id="config"><summary>Gemini connection settings</summary><label for="endpoint">Cloudflare Worker endpoint (never enter an API key here)</label><input id="endpoint" placeholder="https://little-lives-ai.YOUR-NAME.workers.dev"><button id="connect">Save endpoint</button><p class="sub">The browser sends family state to your Worker. AI is optional; the simulation works without it.</p></details><div class="sub">Family conversations · four personalities</div><div id="log" aria-live="polite"></div></div></aside><div id="labels" aria-hidden="true"></div><div id="hint">Drag to rotate · Scroll / pinch to zoom</div><div class="controls"><button id="pause">⏸ Pause</button><button id="speed">1× Speed</button><button id="reset">↺ Reset</button></div><div id="error"></div>
+</head><body><div id="scene"></div><aside id="panel"><h1>🏠 Little Lives <span id="badge">V5.4</span></h1><button id="minimize" type="button" aria-label="Minimize family status">−</button><div id="panelBody"><div id="clock" class="sub">Loading...</div><div id="family"></div><div class="airow"><button id="ai">Enable Gemini</button><span id="status">Offline brains active</span></div><details id="config"><summary>Gemini connection settings</summary><label for="endpoint">Cloudflare Worker endpoint (never enter an API key here)</label><input id="endpoint" placeholder="https://little-lives-ai.YOUR-NAME.workers.dev"><button id="connect">Save endpoint</button><p class="sub">The browser sends family state to your Worker. AI is optional; the simulation works without it.</p></details><div class="sub">Family conversations · four personalities · slower stories</div><div id="log" aria-live="polite"></div></div></aside><div id="labels" aria-hidden="true"></div><div id="hint">Drag to rotate · Scroll / pinch to zoom</div><div class="controls"><button id="pause">⏸ Pause</button><button id="speed">1× Speed</button><button id="reset">↺ Reset</button></div><div id="error"></div>
 <script type="module">
 import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 try{
@@ -192,7 +192,21 @@ function avatar(p,i){
  return {root,rig,arms,legs,mouth};
 }
 const family=profiles.map((p,i)=>({...p,...avatar(p,i),room:p.start,target:null,hunger:75-i*8,energy:75+i*5,happiness:85-i*4,action:'Exploring',nextAction:'Relaxing',timer:0,speech:'',speechUntil:0,memories:[],phase:i}));
-let minutes=420,paused=false,speed=1,uiTime=0,aiEnabled=false,aiBusy=false,lastAI=0;let conversation=[],dialogueQueue=[],nextLineAt=0,offlineTalkTimer=0,sceneNumber=0;const status=document.querySelector('#status');
+let minutes=420,paused=false,speed=1,uiTime=0,aiEnabled=true,aiBusy=false,lastAI=0;
+const DEFAULT_GEMINI_ENDPOINT='https://little-lives-ai.kimolly15.workers.dev';
+let conversation=[],dialogueQueue=[],nextLineAt=0,offlineTalkTimer=-30,sceneNumber=0;
+let currentTopic='',lastTopic='',lastSpeaker='';
+let aiOfflineFallback=false;
+const status=document.querySelector('#status');
+const MEMORY_KEY='little-lives-v5.3-conversations';
+try {
+ const saved=JSON.parse(localStorage.getItem(MEMORY_KEY)||'{}');
+ if(Array.isArray(saved.history))conversation=saved.history.filter(x=>x&&typeof x.speaker==='string'&&typeof x.text==='string').slice(-24);
+ if(Number.isInteger(saved.sceneNumber))sceneNumber=Math.max(0,saved.sceneNumber);
+ if(typeof saved.lastTopic==='string')lastTopic=saved.lastTopic.slice(0,80);
+} catch(e) { console.warn('Conversation memory unavailable',e); }
+function saveMemory(){try{localStorage.setItem(MEMORY_KEY,JSON.stringify({history:conversation.slice(-24),sceneNumber,lastTopic}))}catch(e){}}
+
 const labelLayer=document.querySelector('#labels');
 const labels=new Map();
 for(const p of family){
@@ -223,7 +237,7 @@ minBtn.onclick=()=>{
  minBtn.textContent=collapsed?'+':'−';
  minBtn.setAttribute('aria-label',collapsed?'Expand family status':'Minimize family status');
 };
-function say(p,line){p.speech=String(line).slice(0,160);p.speechUntil=performance.now()+11500;const div=document.createElement('div');div.textContent=p.name+': “'+p.speech+'”';document.querySelector('#log').prepend(div);while(document.querySelector('#log').children.length>7)document.querySelector('#log').lastChild.remove();p.memories.push(p.speech);p.memories=p.memories.slice(-5);conversation.push({speaker:p.name,text:p.speech});conversation=conversation.slice(-16)}
+function say(p,line){p.speech=String(line).slice(0,160);p.speechUntil=performance.now()+11500;const div=document.createElement('div');div.textContent=p.name+': “'+p.speech+'”';document.querySelector('#log').prepend(div);while(document.querySelector('#log').children.length>7)document.querySelector('#log').lastChild.remove();p.memories.push(p.speech);p.memories=p.memories.slice(-5);conversation.push({speaker:p.name,text:p.speech});conversation=conversation.slice(-24);lastSpeaker=p.name;saveMemory()}
 function choose(p,forced){
  let room,action;
  if(forced){room=forced.room;action=forced.action}
@@ -251,14 +265,17 @@ const offlineScenes=[
 ];
 function queueOfflineScene(){
  if(dialogueQueue.length||aiBusy)return;
- const scene=offlineScenes[sceneNumber++%offlineScenes.length];
- dialogueQueue.push(...scene);nextLineAt=0;
+ const index=sceneNumber++%offlineScenes.length;
+ const scene=offlineScenes[index];
+ const topics=['dragon story','cooking pasta','dream about the moon','weekend picnic','homework fractions'];
+ currentTopic=topics[index];lastTopic=currentTopic;
+ dialogueQueue.push(...scene);nextLineAt=performance.now()+2800;saveMemory();
  status.textContent='Offline family conversation';
 }
-function update(dt,t){
+function update(dt,t,realDt){
  minutes+=dt*3;
- offlineTalkTimer+=dt;
- if(!aiEnabled&&!dialogueQueue.length&&offlineTalkTimer>16){offlineTalkTimer=0;queueOfflineScene()}
+ offlineTalkTimer+=realDt;
+ if((!aiEnabled||aiOfflineFallback)&&!dialogueQueue.length&&offlineTalkTimer>65){offlineTalkTimer=0;queueOfflineScene()}
  for(const p of family){
   p.hunger=clamp(p.hunger-dt*.55);p.energy=clamp(p.energy-dt*.35);p.happiness=clamp(p.happiness-dt*.12);
   if(!p.target)choose(p);
@@ -293,7 +310,10 @@ function playDialogue(t){
    if(allowedRooms.includes(d.room)&&allowedActions.includes(d.action))choose(p,{room:d.room,action:d.action});
    if(d.dialogue)say(p,d.dialogue);const listener=family.find(x=>x.name===dialogueQueue[0]?.character);if(listener&&listener!==p){const direction=listener.root.position.clone().sub(p.root.position);p.root.rotation.y=Math.atan2(direction.x,direction.z)}
  }
- nextLineAt=t+Math.max(4300,Math.min(8500,(d.dialogue||'').length*85));
+ // Reading time is based on real seconds, not the simulation speed.
+ nextLineAt=t+Math.max(8500,Math.min(15500,2200+(d.dialogue||'').length*125));
+ if(!dialogueQueue.length){offlineTalkTimer=0;lastTopic=currentTopic;saveMemory();}
+
 }
 async function askGemini(){
  if(!aiEnabled||aiBusy||paused||dialogueQueue.length)return;
@@ -305,7 +325,9 @@ async function askGemini(){
  const payload={
   time:`${Math.floor(minutes/60)%24}:${String(Math.floor(minutes%60)).padStart(2,'0')}`,
   family:family.map(p=>({name:p.name,trait:p.trait,room:p.room,action:p.action,hunger:Math.round(p.hunger),energy:Math.round(p.energy),happiness:Math.round(p.happiness),memories:p.memories})),
-  history:conversation.slice(-12)
+  history:conversation.slice(-20),
+  currentTopic:lastTopic,
+  instruction:'Continue the existing topic naturally. Make replies directly address earlier speakers; avoid abrupt topic changes and repeated openings.'
  };
  try{
   const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),23000);
@@ -317,15 +339,20 @@ async function askGemini(){
   const turns=Array.isArray(result.turns)?result.turns:(result.character?[result]:[]);
   const valid=turns.filter(d=>d&&family.some(p=>p.name===d.character)&&typeof d.dialogue==='string'&&d.dialogue.trim()&&allowedRooms.includes(d.room)&&allowedActions.includes(d.action)).slice(0,6);
   if(!valid.length)throw new Error('Unexpected AI response');
-  dialogueQueue.push(...valid);nextLineAt=0;status.textContent='Four AI personalities active ✓';
- }catch(e){status.textContent='AI unavailable; offline mode continues';console.warn('Gemini request:',e)}
+  aiOfflineFallback=false;offlineTalkTimer=0;
+  dialogueQueue.push(...valid);nextLineAt=performance.now()+1800;currentTopic=lastTopic||'family conversation';status.textContent='Four AI personalities active ✓';
+ }catch(e){aiOfflineFallback=true;offlineTalkTimer=66;status.textContent='Gemini unavailable · offline conversations';console.warn('Gemini request:',e)}
  finally{aiBusy=false;lastAI=performance.now()}
 }
-function animate(t){requestAnimationFrame(animate);const dt=Math.min((t-(animate.last||t))/1000,.05);animate.last=t;if(!paused)update(dt*speed,t);orbit.update();renderer.render(scene,camera);updateLabels();playDialogue(t);uiTime+=dt;if(uiTime>.25){ui();uiTime=0}if(aiEnabled&&!paused&&!aiBusy&&!dialogueQueue.length&&t-lastAI>42000){lastAI=t;askGemini()}}
-family.forEach(p=>choose(p));queueOfflineScene();ui();requestAnimationFrame(animate);
+function animate(t){requestAnimationFrame(animate);const dt=Math.min((t-(animate.last||t))/1000,.05);animate.last=t;if(!paused)update(dt*speed,t,dt);orbit.update();renderer.render(scene,camera);updateLabels();playDialogue(t);uiTime+=dt;if(uiTime>.25){ui();uiTime=0}if(aiEnabled&&!paused&&!aiBusy&&!dialogueQueue.length&&t-lastAI>110000){lastAI=t;askGemini()}}
+family.forEach(p=>choose(p));
+document.querySelector('#endpoint').value=DEFAULT_GEMINI_ENDPOINT;
+document.querySelector('#ai').textContent='Disable Gemini';
+status.textContent='Connecting to Gemini…';
+ui();requestAnimationFrame(animate);askGemini();
 document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'▶ Play':'⏸ Pause'};document.querySelector('#speed').onclick=e=>{speed=speed===1?3:speed===3?6:1;e.target.textContent=speed+'× Speed'};document.querySelector('#reset').onclick=()=>location.reload();
 document.querySelector('#connect').onclick=()=>{const url=document.querySelector('#endpoint').value.trim();if(!/^https:\/\/[^\s/]+\.workers\.dev\/?$/.test(url)){status.textContent='Enter a valid HTTPS *.workers.dev URL';return}status.textContent='Endpoint set. Click Enable Gemini.';document.querySelector('#config').open=false};
-document.querySelector('#ai').onclick=e=>{aiEnabled=!aiEnabled;e.target.textContent=aiEnabled?'Disable Gemini':'Enable Gemini';if(aiEnabled){dialogueQueue.length=0;lastAI=performance.now();askGemini()}else{dialogueQueue.length=0;offlineTalkTimer=17;status.textContent='Offline brains active'}};
+document.querySelector('#ai').onclick=e=>{aiEnabled=!aiEnabled;e.target.textContent=aiEnabled?'Disable Gemini':'Enable Gemini';if(aiEnabled){aiOfflineFallback=false;dialogueQueue.length=0;lastAI=performance.now();askGemini()}else{aiOfflineFallback=false;dialogueQueue.length=0;offlineTalkTimer=0;status.textContent='Offline brains active · quiet time'}};
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 }catch(err){console.error(err);const el=document.querySelector('#error');el.style.display='block';el.textContent='3D rendering error: '+err.message}
 </script></body></html>
